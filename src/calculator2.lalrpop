@@ -1,0 +1,25 @@
+use std::str::FromStr;
+
+grammar;
+
+pub Expression = {
+    Label,
+    Function,
+};
+
+Label = {
+    ALPHANUM,
+    DQSTRING,
+    SQSTRING,
+};
+
+Function: String = FunctionName "(" Arguments ")" => format!("{}{}{}{}", <>);
+FunctionName = ALPHANUM;
+Arguments: String = <a:Argument> "," <b:Argument> => {
+    format!("{:?}", vec![a.to_string(), b.to_string()])
+};
+Argument = ALPHANUM;
+
+ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
+DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
+SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
