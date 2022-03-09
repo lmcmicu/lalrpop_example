@@ -4,18 +4,9 @@ grammar;
 
 match {
     r"[a-zA-Z0-9-_]+",
-    "(",
-    ")",
-    ".",
-    "=",
-    "/",
-    "\\",
-    "\\/",
-    ",",
-    r#""([^"]|\\")*""#,
-    r#"'([^']|\\')*'"#,
 } else {
-    r"[^/]"
+    r"[^/]",
+    _
 }
 
 pub Expression = {
@@ -50,15 +41,20 @@ NamedArg: String = Label "=" Label => format!("{}{}{}", <>);
 
 Regex = {
     RegexMatch,
+    RegexSub,
 }
 RegexMatch: String = "/" RegexPattern "/" RegexFlags => format!("{}{}{}{}", <>);
+RegexSub: String = "s/" RegexPattern "/" RegexPattern "/" RegexFlags => format!(
+    "{}{}{}{}{}{}", <>
+);
 RegexPattern = {
     REGEX_WITH_FORWARD_SLASH,
     REGEX_WITHOUT_FORWARD_SLASH,
 };
-RegexFlags = ALPHANUM;
+RegexFlags: String = LOWER_ALPHA* => format!("{:?}", <>);
 
 ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
+LOWER_ALPHA: String = r"[a-z]" => String::from(<>);
 DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
 SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
 REGEX_WITH_FORWARD_SLASH: String = NO_SLASH* "\\/" NO_SLASH* => format!("{:?}{}{:?}", <>);

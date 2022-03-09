@@ -15,8 +15,8 @@ lalrpop_mod!(pub calculator2);
 
 #[test]
 fn calculator2() {
-    let leif = calculator2::ExpressionParser::new().parse("abba(shoo=laitse, foo(foo(bar)))").unwrap();
-    println!("LEIF: {:?}", leif);
+    let leif = calculator2::ExpressionParser::new().parse("/abba/g)").unwrap();
+    eprintln!("LEIF: {:?}", leif);
     //assert!(calculator2::TermParser::new().parse("22").is_ok());
     //assert!(calculator2::TermParser::new().parse("(22)").is_ok());
     //assert!(calculator2::TermParser::new().parse("((((22))))").is_ok());
@@ -45,7 +45,7 @@ lalrpop_mod!(pub calculator3);
 #[cfg_attr(not(test), allow(unused_macros))]
 macro_rules! test3 {
     ($expr:expr) => {
-        println!("parsing {}", stringify!($expr));
+        eprintln!("parsing {}", stringify!($expr));
         assert_eq!(
             calculator3::ExprParser::new()
                 .parse(stringify!($expr))
