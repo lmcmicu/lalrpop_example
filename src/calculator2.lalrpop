@@ -2,6 +2,22 @@ use std::str::FromStr;
 
 grammar;
 
+match {
+    r"[a-zA-Z0-9-_]+",
+    "(",
+    ")",
+    ".",
+    "=",
+    "/",
+    "\\",
+    "\\/",
+    ",",
+    r#""([^"]|\\")*""#,
+    r#"'([^']|\\')*'"#,
+} else {
+    r"[^/]"
+}
+
 pub Expression = {
     Label,
     Function,
@@ -26,12 +42,25 @@ Argument = {
     Label,
     Field,
     NamedArg,
+    Regex,
     Function,
 };
 Field: String = Label "." Label => format!("{}{}{}", <>);
 NamedArg: String = Label "=" Label => format!("{}{}{}", <>);
 
+Regex = {
+    RegexMatch,
+}
+RegexMatch: String = "/" RegexPattern "/" RegexFlags => format!("{}{}{}{}", <>);
+RegexPattern = {
+    REGEX_WITH_FORWARD_SLASH,
+    REGEX_WITHOUT_FORWARD_SLASH,
+};
+RegexFlags = ALPHANUM;
 
 ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
 DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
 SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
+REGEX_WITH_FORWARD_SLASH: String = NO_SLASH* "\\/" NO_SLASH* => format!("{:?}{}{:?}", <>);
+REGEX_WITHOUT_FORWARD_SLASH: String = NO_SLASH+ => format!("{:?}", <>);
+NO_SLASH: String = r"[^/]" => String::from(<>);
