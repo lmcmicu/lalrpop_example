@@ -15,7 +15,7 @@ lalrpop_mod!(pub calculator2);
 
 #[test]
 fn calculator2() {
-    let leif = calculator2::ExpressionParser::new().parse("abba(2,2)").unwrap();
+    let leif = calculator2::ExpressionParser::new().parse("abba(2)").unwrap();
     println!("LEIF: {:?}", leif);
     //assert!(calculator2::TermParser::new().parse("22").is_ok());
     //assert!(calculator2::TermParser::new().parse("(22)").is_ok());

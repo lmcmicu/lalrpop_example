@@ -13,12 +13,19 @@ Label = {
     SQSTRING,
 };
 
-Function: String = FunctionName "(" Arguments ")" => format!("{}{}{}{}", <>);
+Function: String = FunctionName "(" Arguments ")" => format!("{}{}{:?}{}", <>);
 FunctionName = ALPHANUM;
-Arguments: String = <a:Argument> "," <b:Argument> => {
-    format!("{:?}", vec![a.to_string(), b.to_string()])
+
+Arguments = Comma<Argument>;
+Comma<T>: Vec<T> = {
+    <mut v:(<T> ",")*> <e:T> => {
+        v.push(e);
+        v
+    }
 };
-Argument = ALPHANUM;
+Argument = {
+    Label,
+};
 
 ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
 DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
