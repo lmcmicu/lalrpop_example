@@ -15,7 +15,6 @@ Label = {
 
 Function: String = FunctionName "(" Arguments ")" => format!("{}{}{:?}{}", <>);
 FunctionName = ALPHANUM;
-
 Arguments = Comma<Argument>;
 Comma<T>: Vec<T> = {
     <mut v:(<T> ",")*> <e:T> => {
@@ -25,7 +24,13 @@ Comma<T>: Vec<T> = {
 };
 Argument = {
     Label,
+    Field,
+    NamedArg,
+    Function,
 };
+Field: String = Label "." Label => format!("{}{}{}", <>);
+NamedArg: String = Label "=" Label => format!("{}{}{}", <>);
+
 
 ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
 DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
