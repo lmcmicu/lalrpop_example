@@ -1,9 +1,11 @@
 use std::str::FromStr;
+use ast::AstExpression;
+
 
 grammar;
 
-pub Expression = {
-    Label,
+pub Expression: Box<AstExpression> = {
+    Label => Box::new(AstExpression::Label(<>)),
     Function,
 };
 
@@ -13,7 +15,13 @@ Label = {
     SQSTRING,
 };
 
-Function: String = FunctionName "(" Arguments ")" => format!("{}{}{:?}{}", <>);
+ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
+DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
+SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
+
+Function: Box<AstExpression> = <f:FunctionName> "(" <a:Arguments> ")"
+    => Box::new(AstExpression::Function(f, a));
+
 FunctionName = ALPHANUM;
 Arguments = Comma<Argument>;
 Comma<T>: Vec<T> = {
@@ -22,25 +30,35 @@ Comma<T>: Vec<T> = {
         v
     }
 };
-Argument = {
-    Label,
+
+Argument: Box<AstExpression> = {
+    Label => Box::new(AstExpression::Label(<>)),
     Field,
     NamedArg,
-    Regex,
+    RegexMatch,
+    RegexSub,
     Function,
-};
-Field: String = Label "." Label => format!("{}{}{}", <>);
-NamedArg: String = Label "=" Label => format!("{}{}{}", <>);
-
-ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
-DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
-SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
-
-Regex = {
-    REGEX_MATCH,
-    REGEX_SUB,
 }
 
-REGEX_MATCH: String = r"/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)" => String::from(<>);
-REGEX_SUB: String = r"s/(([^\\/]*(\\/)*[^\\/]*)+)/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)"
-    => String::from(<>);
+Field: Box<AstExpression> = <l1:Label> "." <l2:Label> => Box::new(AstExpression::Field(l1, l2));
+NamedArg: Box<AstExpression> = <l1:Label> "=" <l2:Label> => Box::new(AstExpression::NamedArg(l1, l2));
+
+RegexMatch: Box<AstExpression> = r"/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)" => {
+    let fullmatch = String::from(<>);
+    let re = regex::Regex::new(r"/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)").unwrap();
+    let caps = re.captures(&fullmatch).unwrap();
+    let pattern = caps.get(1).unwrap().as_str().to_string();
+    let flags = caps.get(4).unwrap().as_str().to_string();
+    Box::new(AstExpression::RegexMatch(pattern, flags))
+};
+
+RegexSub: Box<AstExpression> = r"s/(([^\\/]*(\\/)*[^\\/]*)+)/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)" => {
+    let fullmatch = String::from(<>);
+    let re = regex::Regex::new(r"s/(([^\\/]*(\\/)*[^\\/]*)+)/(([^\\/]*(\\/)*[^\\/]*)+)/([a-z]*)")
+        .unwrap();
+    let caps = re.captures(&fullmatch).unwrap();
+    let pattern = caps.get(1).unwrap().as_str().to_string();
+    let replacement = caps.get(4).unwrap().as_str().to_string();
+    let flags = caps.get(7).unwrap().as_str().to_string();
+    Box::new(AstExpression::RegexSub(pattern, replacement, flags))
+};

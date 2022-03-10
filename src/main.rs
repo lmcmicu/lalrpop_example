@@ -15,8 +15,10 @@ lalrpop_mod!(pub calculator2);
 
 #[test]
 fn calculator2() {
-    let leif = calculator2::ExpressionParser::new().parse(r"foo(s/b\/\/dddar/j\/ar/a)").unwrap();
-    eprintln!("LEIF: {:?}", leif);
+    let leif = calculator2::ExpressionParser::new()
+        .parse(r"foo(bar, jar, mar.lar, scar=tar, hor(odecki), /bin/d, s/foo/var/sde)")
+        .unwrap();
+    eprintln!("PARSED:\n{:#?}", leif);
     //assert!(calculator2::TermParser::new().parse("22").is_ok());
     //assert!(calculator2::TermParser::new().parse("(22)").is_ok());
     //assert!(calculator2::TermParser::new().parse("((((22))))").is_ok());

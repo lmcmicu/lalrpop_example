@@ -1,5 +1,16 @@
 use std::fmt::{Debug, Error, Formatter};
 
+#[derive(Debug)]
+pub enum AstExpression {
+    Label(String),
+    Field(String, String),
+    NamedArg(String, String),
+    RegexMatch(String, String),
+    RegexSub(String, String, String),
+    Function(String, Vec<Box<AstExpression>>),
+}
+
+/////////////////////////////////////////////////////////////////////////////
 pub enum Expr {
     Number(i32),
     Op(Box<Expr>, Opcode, Box<Expr>),
