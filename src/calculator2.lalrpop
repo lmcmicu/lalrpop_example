@@ -2,12 +2,12 @@ use std::str::FromStr;
 
 grammar;
 
-match {
-    r"[a-zA-Z0-9-_]+",
-} else {
-    r"[^/]",
-    _
-}
+//match {
+//    r"[a-zA-Z0-9-_]+",
+//} else {
+//    r"[^/]",
+//    _
+//}
 
 pub Expression = {
     Label,
@@ -33,30 +33,31 @@ Argument = {
     Label,
     Field,
     NamedArg,
-    Regex,
+    //Regex,
     Function,
 };
 Field: String = Label "." Label => format!("{}{}{}", <>);
 NamedArg: String = Label "=" Label => format!("{}{}{}", <>);
 
-Regex = {
-    RegexMatch,
-    RegexSub,
-}
-RegexMatch: String = "/" RegexPattern "/" RegexFlags => format!("{}{}{}{}", <>);
-RegexSub: String = "s/" RegexPattern "/" RegexPattern "/" RegexFlags => format!(
-    "{}{}{}{}{}{}", <>
-);
-RegexPattern = {
-    REGEX_WITH_FORWARD_SLASH,
-    REGEX_WITHOUT_FORWARD_SLASH,
-};
-RegexFlags: String = LOWER_ALPHA* => format!("{:?}", <>);
-
 ALPHANUM: String = r"[a-zA-Z0-9-_]+" => String::from(<>);
-LOWER_ALPHA: String = r"[a-z]" => String::from(<>);
 DQSTRING: String = r#""([^"]|\\")*""# => String::from(<>);
 SQSTRING: String = r#"'([^']|\\')*'"# => String::from(<>);
-REGEX_WITH_FORWARD_SLASH: String = NO_SLASH* "\\/" NO_SLASH* => format!("{:?}{}{:?}", <>);
-REGEX_WITHOUT_FORWARD_SLASH: String = NO_SLASH+ => format!("{:?}", <>);
-NO_SLASH: String = r"[^/]" => String::from(<>);
+
+//Regex = {
+//    RegexMatch,
+//    RegexSub,
+//}
+//RegexMatch: String = "/" RegexPattern "/" RegexFlags => format!("{}{}{}{}", <>);
+//RegexSub: String = "s/" RegexPattern "/" RegexPattern "/" RegexFlags => format!(
+//    "{}{}{}{}{}{}", <>
+//);
+//RegexPattern = {
+//    REGEX_WITH_FORWARD_SLASH,
+//    REGEX_WITHOUT_FORWARD_SLASH,
+//};
+//RegexFlags: String = LOWER_ALPHA* => format!("{:?}", <>);
+
+//LOWER_ALPHA: String = r"[a-z]" => String::from(<>);
+//REGEX_WITH_FORWARD_SLASH: String = NO_SLASH* "\\/" NO_SLASH* => format!("{:?}{}{:?}", <>);
+//REGEX_WITHOUT_FORWARD_SLASH: String = NO_SLASH+ => format!("{:?}", <>);
+//NO_SLASH: String = r"[^/]" => String::from(<>);
